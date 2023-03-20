@@ -1,30 +1,43 @@
 <template lang="html">
-    <div class="container-main">
-        <l-map />
+    <div class="component-container">
+        <div class="component-container" v-if="loggedIn" >
+            <home />
+            <alert-container>
+                <app-alert v-if="$store.state.alert.message" />
+            </alert-container>
+        </div>
+        <login v-else />
     </div>
 </template>
 
 <script>
 
-import LMap from 'ptgmp/components/leafletmap/LMap.vue';
+import AppAlert from 'ptgmp/components/utils/Alert.vue';
+import AlertContainer from 'ptgmp/components/utils/AlertContainer.vue';
+import Login from 'ptgmp/routes/Login.vue';
+import Home from 'ptgmp/routes/Home.vue';
 
 export default {
 
     components: {
-        LMap
+        AlertContainer,
+        AppAlert,
+        Login,
+        Home
+    },
+
+    // mounted() {
+    //     let { dispatch } = this.$store;
+    //     dispatch('alert/info', 'hello');
+    //     // dispatch('alert/delayedClear', 2000);
+    // },
+
+    computed: {
+        loggedIn() {
+            let { id } = this.$store.state.user;
+            return id > 0 || false;
+        }
     }
 
 }
 </script>
-
-
-<style media="screen" lang="scss">
-html,body, .container-main {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-}
-
-
-</style>

@@ -1,4 +1,5 @@
-
+import auth from './auth.config';
+import demoaccount from './demoaccount.config';
 
 const clientApp = {
     key: 'fkt6ds',
@@ -10,8 +11,17 @@ const device = {
     local: 'lka8kt'
 };
 
+const demo = true;
+const allowDemoAccount = true;
+const useApi = false;
+
 
 export default {
     clientApp,
-    device
+    device,
+    allowDemoAccount,
+    useApi,
+    auth,
+    demoaccount,
+    demo
 }

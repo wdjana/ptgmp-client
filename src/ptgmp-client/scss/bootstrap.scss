@@ -1,0 +1,52 @@
+html,body, .container-main, .component-container {
+    height: 100%;
+}
+
+// .container-main,
+// .component-container {
+//     padding: 15px;
+//     height: 400px;
+//
+//     background-color: #cc0;
+// }
+
+html, body {
+    font-size: 14px;
+}
+
+.no-gutters {
+	margin-right: 0;
+	margin-left: 0;
+}
+
+.no-gutters > .col,
+.no-gutters > [class*="col-"] {
+	padding-right: 0;
+	padding-left: 0;
+}
+
+.btn-group-xs > .btn, .btn-xs {
+    padding: 3px 5px;
+    border-radius: 2px;
+    line-height: 1.4;
+    font-size: 11px;
+}
+
+a {
+    outline: none;
+
+    &:hover {
+        text-decoration: none;
+        outline: none;
+    }
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}

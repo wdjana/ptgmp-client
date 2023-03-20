@@ -1,3 +1,5 @@
+import jwt from 'jsonwebtoken';
+
 const headers = {
     Accept: 'application/json',
     'Content-Type':'application/json',
@@ -8,6 +10,13 @@ const cdevice = {};
 const csession = {};
 const server = {};
 
+function transform(data)
+{
+    return Object.entries(data)
+        .map(x => `${encodeURIComponent(x[0])}=${encodeURIComponent(x[1])}`)
+        .join('&');
+}
+
 function resolveResponse(response) {
     if (response.ok) {
         return response.text()
@@ -16,15 +25,25 @@ function resolveResponse(response) {
                     let json = JSON.parse(text);
                     console.log({ json });
 
-                    let { device, session, res, err } = json;
+                    let { device, session, res, err, user } = json;
 
                     if (device) {
-                        cdevice.token = device;
-                        localStorage.setItem(cdevice.local, cdevice.token);
+                        localStorage.setItem(cdevice.local, device);
                     }
 
-                    if (session) {
-                        csession.token = session;
+                    if (session && csession.local) {
+                        localStorage.setItem(csession.local, session);
+                    }
+
+                    // not saving user info on localStorage
+                    if (user) {
+                        if (user.id && user.id > 0) {
+                            //do checkin
+                            server.user = user;
+                        } else {
+                            delete server.user;
+                            // do logout
+                        }
                     }
 
                     return { res, err };
@@ -44,9 +63,15 @@ function resolveResponse(response) {
 function initConfig(config) {
     capp.key = config.clientApp.key;
     capp.token = config.clientApp.token;
+    capp.salt = config.salt;
 
     cdevice.header = config.device.header;
     cdevice.local = config.device.local;
+
+    if (config.session) {
+        csession.header = config.session.header;
+        csession.local = config.session.local;
+    }
 }
 
 function initOptions() {
@@ -60,17 +85,30 @@ function initOptions() {
         options.headers[cdevice.header] = cdevice.token;
     }
 
+    if (csession.local) {
+        csession.token = localStorage.getItem(csession.local);
+        if (csession.token && csession.header) {
+            options.headers[csession.header] = csession.token;
+        }
+    }
+
     return options;
+}
+
+function sendRequest(url, options) {
+    return fetch(url, options)
+        .then(response => resolveResponse(response))
+        .catch( err => {
+            return { err };
+        });
 }
 
 function init(api, config) {
     initConfig(config);
     let options = initOptions();
-
     let url = `${api}?synchronize`;
 
-    return fetch(url, options)
-        .then(response => resolveResponse(response))
+    return sendRequest(url, options)
         .then(result => {
             let retval = false;
             let { res } = result;
@@ -78,12 +116,45 @@ function init(api, config) {
 
             if (time > 0) {
                 server.time = time;
+                capp.api = api;
                 retval = true;
             }
 
             return retval;
         });
-
 }
 
-export default { init };
+
+
+function get(query) {
+    let options = initOptions();
+    let url = `${capp.api}?${query}`;
+    return sendRequest(url, options);
+}
+
+function post(query, data) {
+    if (cdevice.token && capp.salt) {
+        let salt = `${capp.salt}${cdevice.token}${capp.salt}`;
+        data = jwt.sign(data, salt, { algorithm: 'HS256' });
+        let body = transform({ data });
+
+        let options = initOptions();
+        options.method = 'POST';
+        options.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
+        options.body = body;
+
+        let url = `${capp.api}?${query}`;
+
+        return sendRequest(url, options);
+    } else {
+        return { err: 'invalid credentials' };
+    }
+}
+
+
+function getserver() {
+    return server;
+}
+
+export default { init, get, post };
+export { getserver };

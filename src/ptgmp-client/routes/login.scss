@@ -1,0 +1,49 @@
+.login-container {
+    max-width: 330px;
+    margin: 0 auto;
+    padding-top: 3%;
+    padding-left: 15px;
+    padding-right: 15px;
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        font-weight: bold;
+        display: block;
+        padding: 5px 0px 0px;
+    }
+
+    input.login-control {
+        display: block;
+        width: 100%;
+        font-size: 92%;
+
+        border: 1px solid #9c9c9c;
+        padding: 8px 11px;
+
+        &:focus,
+        &:hover {
+            box-shadow: 0 0 5px rgba(0,0,0, 0.2);
+        }
+    }
+
+    button.button-submit {
+        display: block;
+        width: 100%;
+
+        border: 1px solid #9c9c9c;
+        background-color: #efefef;
+        padding: 11px;
+        color: #686868;
+        font-weight: bold;
+        margin-top: 15px;
+
+        &:hover,
+        &:focus {
+            text-shadow: 1px 1px 5px rgba(0,0,0, 0.2);
+            box-shadow: 0 0 5px rgba(0,0,0, 0.2);
+        }
+    }
+}
